@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StretchFitnessHub")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dd56f29d2300c4dbff92df5fad869549cf37724b")]
 [assembly: System.Reflection.AssemblyProductAttribute("StretchFitnessHub")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StretchFitnessHub")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

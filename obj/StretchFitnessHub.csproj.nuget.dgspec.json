@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\wkwkwk\\StretchFitnessHub.csproj": {}
+    "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\Stretch Fitness Hub\\StretchFitnessHub.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\wkwkwk\\StretchFitnessHub.csproj": {
+    "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\Stretch Fitness Hub\\StretchFitnessHub.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\wkwkwk\\StretchFitnessHub.csproj",
+        "projectUniqueName": "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\Stretch Fitness Hub\\StretchFitnessHub.csproj",
         "projectName": "StretchFitnessHub",
-        "projectPath": "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\wkwkwk\\StretchFitnessHub.csproj",
+        "projectPath": "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\Stretch Fitness Hub\\StretchFitnessHub.csproj",
         "packagesPath": "C:\\Users\\Ray Christian\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\wkwkwk\\obj\\",
+        "outputPath": "C:\\Users\\Ray Christian\\OneDrive\\Desktop\\Stretch Fitness Hub\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -22,15 +22,15 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net9.0"
+          "net7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net9.0": {
-            "targetAlias": "net9.0",
+          "net7.0": {
+            "targetAlias": "net7.0",
             "projectReferences": {}
           }
         },
@@ -47,8 +47,8 @@
         "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "dependencies": {
             "BCrypt.Net-Next": {
               "target": "Package",
@@ -56,17 +56,17 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.7, )"
+              "version": "[7.0.12, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.7, )"
+              "version": "[7.0.12, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.7, )"
+              "version": "[7.0.12, )"
             },
             "QRCoder": {
               "target": "Package",
@@ -74,7 +74,7 @@
             },
             "System.Drawing.Common": {
               "target": "Package",
-              "version": "[9.0.9, )"
+              "version": "[7.0.0, )"
             }
           },
           "imports": [
@@ -88,6 +88,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[7.0.20, 7.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -96,7 +114,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }
