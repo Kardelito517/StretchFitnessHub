@@ -1,0 +1,188 @@
+﻿@model StretchFitnessHub.ViewModels.MemberDashboardViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/Css/Member.css">
+</head>
+<body>
+    <form id="logout-form" asp-controller="Member" asp-action="Logout" method="post" style="display:none;"></form>
+    <div class="container">
+        <main class="main-content">
+            <div class="card membership-card">
+                <div class="membership-header">
+                    <h2 class="card-title">Membership Status</h2>
+                    <button type="button" id="logout-button" class="logout-btn">Logout</button>
+                </div>
+
+                @if (Model.MembershipEnd < DateTime.Now)
+                {
+                    <span class="status-badge inactive">Inactive</span>
+                    <div class="membership-details">
+                        <p class="detail-item">No active membership</p>
+                    </div>
+                }
+                else
+                {
+                    <span class="status-badge active">Active</span>
+                    <div class="progress-ring">
+                        <svg class="progress-ring__svg" viewBox="0 0 120 120">
+                            <circle class="progress-ring__bg" cx="60" cy="60" r="50" stroke-width="8" fill="transparent" />
+                            <circle id="membership-progress" class="progress-ring__circle" cx="60" cy="60" r="50" stroke-width="8" fill="transparent" stroke-linecap="round"
+                                    stroke-dasharray="314" stroke-dashoffset="@(314 - (314 * Model.Percentage / 100))" />
+                        </svg>
+                        <div class="progress-text-container">
+                            <span id="progress-text">@Model.Percentage%</span>
+                            <span id="days-left-text" class="days-left">@Model.RemainingDays days left</span>
+                        </div>
+                    </div>
+                    <div class="membership-details">
+                        <p class="detail-item">Start Date: <span class="detail-value" id="start-date">@Model.MembershipStart.ToString("MMM dd, yyyy")</span></p>
+                        <p class="detail-item">Expiration: <span class="detail-value" id="expiration-date">@Model.MembershipEnd.ToString("MMM dd, yyyy")</span></p>
+                    </div>
+                }
+            </div>
+
+            <div class="right-column">
+                <div class="card profile-card">
+                    <div class="profile-header">
+                        <h2 class="card-title">User Profile</h2>
+                        <button type="button" id="edit-profile-button" class="edit-profile-btn">Edit Profile</button>
+                    </div>
+                    <div class="profile-content">
+                        <div id="profile-picture-container" class="profile-pic-container" style="cursor:pointer;">
+                            @if (!string.IsNullOrEmpty(Model.ProfileImagePath))
+                            {
+                                <img id="profile-picture" src="@Model.ProfileImagePath"
+                                     alt="Profile Picture" style="width:120px;height:120px;border-radius:50%;" />
+                            }
+                            else
+                            {
+                                <img id="profile-picture" src="~/images/default-avatar.png"
+                                     alt="Profile Picture" style="width:120px;height:120px;border-radius:50%;" />
+                                <span id="profile-picture-initials">
+                                    @(
+                                                                     string.IsNullOrWhiteSpace(Model.FullName)
+                                                                    ? "NA"
+                                                                    : new string(
+                                                                    Model.FullName
+                                                                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                                                    .Where(n => n.Length > 0)
+                                                                    .Select(n => n[0])
+                                                                    .ToArray()
+                                                                    ).ToUpper()
+                                                                    )
+
+                                </span>
+                            }
+
+                            <form id="upload-form" asp-controller="Member" asp-action="UploadProfileImage" method="post" enctype="multipart/form-data" style="display:none;">
+                                <input type="file" id="profile-image-input" name="profileImage" accept="image/*" />
+                            </form>
+                        </div>
+
+                        <div class="profile-info">
+                            <p id="profile-name" class="profile-name">@Model.FullName</p>
+                        </div>
+                    </div>
+                    <div class="profile-details-grid">
+                        <div class="detail-box">
+                            <h3 class="detail-label">Member Since</h3>
+                            <p id="member-since" class="detail-value">@Model.MembershipStart.ToString("MMM dd, yyyy")</p>
+                        </div>
+                        <div class="detail-box">
+                            <h3 class="detail-label">Contact Number</h3>
+                            <p id="profile-contact" class="detail-value">@Model.PhoneNumber</p>
+                        </div>
+                        <div class="detail-box">
+                            <h3 class="detail-label">Email</h3>
+                            <p id="profile-email" class="profile-email">@Model.Email</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card activity-card">
+                    <h2 class="card-title">QR Code</h2>
+
+                    @if (!string.IsNullOrEmpty(Model.QrCodeImage))
+                    {
+                        <div class="qr-container">
+                            <img src="@Model.QrCodeImage" alt="QR Code" class="qr-image" />
+                            <a asp-controller="Member" asp-action="DownloadQr" asp-route-id="@Model.MemberId" class="download-btn">
+                                Download QR
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="no-qr">No QR Code available</p>
+                    }
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal structures remain the same -->
+    <div id="logout-modal" class="modal-overlay hidden">
+        <div id="logout-confirmation-content" class="modal-content" style="background-color: #1f2937; color: #f3f4f6;">
+            <h3 class="modal-title">Confirm Logout</h3>
+            <p class="modal-message">Are you sure you want to log out?</p>
+            <div class="modal-actions">
+                <button id="cancel-logout" class="cancel-btn">Cancel</button>
+                <button id="confirm-logout" class="logout-confirm-btn">Logout</button>
+            </div>
+        </div>
+
+        <div id="logout-loading-content" class="modal-content hidden">
+            <div class="spinner"></div>
+            <p>Logging out...</p>
+        </div>
+    </div>
+
+    <!-- Other modals remain unchanged -->
+    <div id="membershipModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Membership Details</h2>
+            <p><strong>Name:</strong> @Model.FullName</p>
+            <p><strong>Start Date:</strong> @Model.MembershipStart.ToString("MMM dd, yyyy")</p>
+            <p><strong>End Date:</strong> @Model.MembershipEnd.ToString("MMM dd, yyyy")</p>
+        </div>
+    </div>
+
+    <div id="edit-profile-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close" id="close-edit-profile">&times;</span>
+            <h2>Edit Profile</h2>
+            <form asp-controller="Member" asp-action="EditProfile" method="post" autocomplete="off">
+                <div class="form-group">
+                    <label for="editFullName">Full Name</label>
+                    <input type="text" id="editFullName" name="FullName" class="form-input" value="@Model.FullName" required />
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" name="Email" class="form-input" value="@Model.Email" required />
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">Contact Number</label>
+                    <input type="text" id="editPhone" name="PhoneNumber" class="form-input" value="@Model.PhoneNumber" required />
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">Password</label>
+                    <input type="password" id="editPassword" name="Password" class="form-input" required />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" id="cancel-edit-profile">Cancel</button>
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/js/Js/Member.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/Css/registration.css">
+    <title>Register</title>
+</head>
+<body>
+    @{
+        ViewBag.Title = "Register";
+    }
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="message-box" style="color: limegreen; text-align: center; margin-bottom: 1rem;">
+            @TempData["Message"]
+        </div>
+    }
+
+    <div class="registration-wrapper">
+        <header class="app-header">
+            <h1 class="logo">Stretch Fitness Hub</h1>
+        </header>
+
+        <main class="registration-main">
+            <div class="registration-container">
+                <h2 style="color: white;">Gym Member Registration</h2>
+                <p class="subtitle">Fill in your details to join our fitness community.</p>
+
+                <form asp-controller="Account" asp-action="Registration" method="post" id="registrationForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-step active">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="Request.FullName" placeholder="e.g. Ray Christian Estrada">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="Request.Username" placeholder="e.g. Karding123" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="Request.Email" placeholder="e.g. Karding@gmail.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input type="tel" id="phoneNumber" name="Request.PhoneNumber" placeholder="11-digit phone number" required>
+                        </div>
+
+                        <div class="form-group password-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="Password" name="Request.Password" placeholder="Create a password" required>
+                        </div>
+
+                        <div class="form-group password-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="Request.ConfirmPassword" placeholder="Re-enter your password" required>
+                        </div>
+
+
+                        <button type="button" class="next-btn submit-btn">Next</button>
+                    </div>
+
+
+
+                    <div class="form-step">
+                        <div class="form-group">
+                            <label for="membershipPlan">Choose Membership Plan</label>
+                            <select id="membershipPlan" name="Request.MembershipPlan" required>
+                                <option value="GymOnly">
+                                    Gym Basic Plan (₱@(ViewBag?.Pricing?.GymOnlyPrice ?? 0) / month)
+                                </option>
+
+                                <option value="GymWithClass">
+                                    Gym with Class Plan (₱@(ViewBag?.Pricing?.GymWithClassPrice ?? 0) / month)
+                                </option>
+
+                                <option value="ClassOnly">
+                                    Class Plan (₱@(ViewBag?.Pricing?.ClassOnlyPrice ?? 0) / month)
+                                </option>
+                            </select>
+
+
+                        </div>
+
+                        <div class="form-group" id="preferredClassContainer" style="display: none;">
+                            <label>Preferred Class</label>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="Request.PreferredClasses" value="None" checked>
+                                    None
+                                </label>
+
+                                @if (Model.ClassList != null && Model.ClassList.Count > 0)
+                                {
+                                    foreach (var cls in Model.ClassList)
+                                    {
+                                        <label>
+                                            <input type="radio" name="Request.PreferredClasses" value="@cls.ClassName">
+                                            @cls.ClassName
+                                        </label>
+                                    }
+                                }
+                                else
+                                {
+                                    <p style="color: gray;">No classes available right now.</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="step-buttons">
+                            <button type="button" class="prev-btn submit-btn">Back</button>
+                            <button type="submit" class="submit-btn">Register & Proceed to Payment</button>
+                        </div>
+                    </div>
+
+
+
+
+                </form>
+
+
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 Stretch Fitness Hub. All rights reserved.</p>
+        </footer>
+
+        <div id="errorModal" class="modal-overlay hidden">
+            <div class="modal-box">
+                <h3 class="modal-title">⚠ Validation Error</h3>
+                <p id="errorMessage"></p>
+                <button id="closeModal" class="modal-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNIQUE Existing Member Modal -->
+    <div id="existingMemberModal" class="existing-member-overlay hidden">
+        <div class="existing-member-box">
+            <h3 class="existing-member-title">⚠ Existing Member</h3>
+            <p class="existing-member-message">
+                A member with the same email or phone number already exists in our system.
+            </p>
+        </div>
+    </div>
+
+    <script src="~/js/Registration.js"></script>
+</body>
+</html>

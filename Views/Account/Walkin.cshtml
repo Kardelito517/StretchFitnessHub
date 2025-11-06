@@ -1,0 +1,299 @@
+﻿@model StretchFitnessHub.ViewModels.WalkinViewModel
+@{
+    ViewBag.Title = "Walk-in Registration";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walk-in Registration</title>
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #111827;
+            --text-color: #fff;
+            --text-muted: #9ca3af;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .registration-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            padding: 20px;
+            text-align: center;
+            background-color: #1f2937;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .registration-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .registration-container {
+            background-color: #1f2937;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+            .registration-container h2 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                margin-bottom: 5px;
+                font-size: 0.9rem;
+            }
+
+            .form-group input, .form-group select {
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid #374151;
+                background-color: #111827;
+                color: #fff;
+            }
+
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+            }
+
+        .app-footer {
+            padding: 15px;
+            text-align: center;
+            background-color: #1f2937;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Modal */
+        .modal.fade {
+            display: none;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-dialog {
+            max-width: 400px;
+            margin: 1.75rem auto;
+        }
+
+        .modal-content {
+            background-color: #1f2937;
+            color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .btn-modal-ok {
+            padding: 8px 20px;
+            background-color: #2563eb;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .message-box {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="registration-wrapper">
+        <header class="app-header">
+            <h1 class="logo">Stretch Fitness Hub</h1>
+        </header>
+
+        <main class="registration-main">
+            <div class="registration-container">
+                <h2>Walk-in Registration</h2>
+                <p class="subtitle">Enter your name to log your visit.</p>
+
+                @if (TempData["Message"] != null)
+                {
+                    <div class="message-box" style="color: limegreen;">
+                        @TempData["Message"]
+                    </div>
+                }
+
+                <form asp-controller="Account" asp-action="SubmitWalkin" method="post" id="walkinForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="FullName" placeholder="Nash Floralde" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="walkinPlan">Select Walk-in Plan</label>
+                        <select id="walkinPlan" name="WalkinPlan" required>
+                            <option value="">-- Select a Plan --</option>
+                            <option value="GymPlan">
+                                Gym Plan / ₱@(ViewBag?.Pricing?.WalkInGymPrice ?? 0)
+                            </option>
+                            <option value="ClassPlan">
+                                Class Plan / ₱@(ViewBag?.Pricing?.WalkInClassPrice ?? 0)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="walkinClassContainer" style="display:none;">
+                        <label>Preferred Class</label>
+                        <div class="radio-group">
+                            @if (Model?.ClassList != null && Model.ClassList.Count > 0)
+                            {
+                                foreach (var cls in Model.ClassList)
+                                {
+                                    <label>
+                                        <input type="radio" name="PreferredClasses" value="@cls.ClassName">
+                                        @cls.ClassName
+                                    </label>
+                                }
+                            }
+                            else
+                            {
+                                <p style="color: gray;">No classes available right now.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="margin-top: 10px;">Time In</button>
+                </form>
+
+                <!-- Error Modal -->
+                <div id="errorModal" class="modal fade">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content text-center">
+                            <h5>⚠ Validation Error</h5>
+                            <p id="errorMessage"></p>
+                            <button type="button" class="btn-modal-ok" id="closeErrorModal">OK</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 Stretch Fitness Hub. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const walkinForm = document.getElementById('walkinForm');
+            const walkinPlan = document.getElementById('walkinPlan');
+            const walkinClassContainer = document.getElementById('walkinClassContainer');
+            const errorModal = document.getElementById('errorModal');
+            const errorMessage = document.getElementById('errorMessage');
+            const closeErrorModal = document.getElementById('closeErrorModal');
+
+            function showErrorModal(msg) {
+                errorMessage.textContent = msg;
+                errorModal.classList.add('show');
+            }
+
+            closeErrorModal.addEventListener('click', () => {
+                errorModal.classList.remove('show');
+            });
+
+            function updateClassVisibility() {
+                if (walkinPlan.value === "ClassPlan") {
+                    walkinClassContainer.style.display = "block";
+                } else {
+                    walkinClassContainer.style.display = "none";
+                    const radios = document.querySelectorAll('input[name="PreferredClasses"]');
+                    radios.forEach(r => r.checked = false);
+                }
+            }
+
+            // Run on page load
+            updateClassVisibility();
+
+            // Run when user changes plan
+            walkinPlan.addEventListener('change', updateClassVisibility);
+
+            // Form submission validation
+            walkinForm.addEventListener('submit', function (event) {
+                if (!walkinPlan.value) {
+                    event.preventDefault();
+                    showErrorModal('Please select a walk-in plan.');
+                    return;
+                }
+                if (walkinPlan.value === "ClassPlan") {
+                    const selectedClass = document.querySelector('input[name="PreferredClasses"]:checked');
+                    if (!selectedClass) {
+                        event.preventDefault();
+                        showErrorModal('Please select a class for the Class Plan.');
+                        return;
+                    }
+                }
+            });
+
+            // Show success modal if TempData["Message"] exists
+            var successMessage = '@(TempData["Message"] ?? "")';
+            if (successMessage) {
+                alert(successMessage); // optional simple alert instead of modal
+            }
+        });
+    </script>
+
+</body>
+</html>

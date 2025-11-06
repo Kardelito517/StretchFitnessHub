@@ -1,0 +1,524 @@
+﻿
+:root {
+    --bg-dark: #1a1a2e;
+    --card-bg: #2a2a4a;
+    --text-light: #e0e0e0;
+    --text-muted: #a0a0b0;
+    --accent-color: #64ffda;
+    --button-hover: #52e1bb;
+    --error-color: #e74c3c;
+    --success-color: #2ecc71;
+    --border-color: #4a4a6e;
+    --input-bg: #3a3a5a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #0f172a;
+    color: var(--text-light);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+
+.registration-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    min-height: calc(100vh - 40px);
+    background-color: #0f172a;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+.app-header {
+    background-color: #1e293b;
+    padding: 15px 30px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.logo {
+    color: white;
+    font-size: 1.8em;
+    margin: 0;
+}
+
+
+.registration-main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 20px;
+}
+
+
+.registration-container {
+    background-color: #1e293b;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 500px; 
+    text-align: center;
+}
+
+    .registration-container h2 {
+        color: var(--accent-color);
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .registration-container .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        font-size: 0.95em;
+    }
+
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left; 
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-light);
+    font-size: 0.95em;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+select {
+    width: 100%; 
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--input-bg);
+    color: var(--text-light);
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="tel"]::placeholder,
+    input[type="password"]::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.3); 
+    }
+
+select {
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M287%2069.9L146.2%20210.7%205.4%2069.9c-11.4-11.4-30.1-11.4-41.5%200-11.4%2011.4-11.4%2030.1%200%2041.5l161.4%20161.4c11.4%2011.4%2030.1%2011.4%2041.5%200L328.5%20111.4c11.4-11.4%2011.4-30.1%200-41.5C317.1%2058.5%20298.4%2058.5%20287%2069.9z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    padding-right: 30px;
+}
+
+
+.password-group {
+    position: relative;
+}
+
+    .password-group input[type="password"],
+    .password-group input[type="text"] { 
+        padding-right: 40px; 
+    }
+
+.password-toggle {
+    position: absolute;
+    right: 12px; 
+    top: 50%; 
+    transform: translateY(calc(-50% + 10px)); 
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1.1em;
+}
+
+    .password-toggle:hover {
+        color: var(--accent-color);
+    }
+
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px; 
+    margin-top: 10px;
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px; 
+    cursor: pointer;
+    font-size: 0.95em;
+    -webkit-user-select: none; 
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: var(--text-light); 
+}
+
+
+    .checkbox-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+
+.checkbox-container:hover input ~ .checkmark {
+    border-color: var(--accent-color);
+}
+
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+
+.checkbox-container .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid var(--bg-dark); 
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+
+
+.submit-btn {
+    background-color: #6366f1;
+    color: var(--bg-dark); 
+    padding: 14px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 25px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .submit-btn:hover {
+        background-color: var(--button-hover);
+        transform: translateY(-2px);
+    }
+
+
+.form-message {
+    margin-top: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: var(--text-light); 
+}
+
+    .form-message.error {
+        color: var(--error-color);
+    }
+
+    .form-message.success {
+        color: var(--success-color);
+    }
+
+.app-footer {
+    background-color: var(--card-bg);
+    padding: 15px 30px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+
+@media (max-width: 768px) {
+    .registration-container {
+        padding: 30px 25px;
+        max-width: 400px; 
+    }
+
+        .registration-container h2 {
+            font-size: 1.8em;
+        }
+
+    .app-header, .app-footer {
+        padding: 12px 20px;
+    }
+
+    .logo {
+        font-size: 1.6em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .registration-wrapper {
+        min-height: calc(100vh - 20px);
+        border-radius: 0; 
+        box-shadow: none; 
+    }
+
+    .registration-container {
+        padding: 25px 20px;
+        border-radius: 0; 
+        box-shadow: none; 
+        background-color: transparent; 
+    }
+
+    .registration-main {
+        padding: 20px 10px;
+    }
+
+    .registration-container h2 {
+        font-size: 1.5em;
+    }
+
+    .submit-btn {
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    select {
+        padding: 10px;
+    }
+
+    .password-toggle {
+        font-size: 1em; 
+        right: 10px; 
+        transform: translateY(calc(-50% + 8px)); 
+    }
+}
+
+/* Overlay background */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Hidden by default */
+.hidden {
+    display: none;
+}
+
+/* Modal box */
+.modal-box {
+    background: #1e1e2f; /* dark theme */
+    color: #fff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0,0,0,0.6);
+}
+
+/* Title */
+.modal-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* Message */
+.modal-box p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Button */
+.modal-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+    .modal-btn:hover {
+        background: #e84118;
+    }
+
+
+.form-step {
+    display: none;
+}
+
+    .form-step.active {
+        display: block;
+    }
+
+/* ===== UNIQUE EXISTING MEMBER MODAL ===== */
+.existing-member-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+    /* Show modal */
+    .existing-member-overlay.show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+/* Box design */
+.existing-member-box {
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 1px solid rgba(255, 70, 70, 0.6);
+    box-shadow: 0 0 18px rgba(255, 40, 40, 0.4);
+    border-radius: 14px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    animation: modalPop 0.25s ease forwards;
+    max-width: 300px;
+    width: 85%;
+    color: #fff;
+}
+
+/* Title */
+.existing-member-title {
+    color: #ff4c4c;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+/* Message */
+.existing-member-message {
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Animation for pop-in */
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ✅ Smooth fade-out animation */
+.existing-member-overlay.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* ✅ Responsive for smaller screens */
+@media (max-width: 480px) {
+    .existing-member-box {
+        max-width: 85%;
+        padding: 1.2rem 1.5rem;
+    }
+
+    .existing-member-title {
+        font-size: 1rem;
+    }
+
+    .existing-member-message {
+        font-size: 0.9rem;
+    }
+}
+
+#preferredClassContainer {
+    display: none;
+}
+

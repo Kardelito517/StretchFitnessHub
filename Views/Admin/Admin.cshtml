@@ -1,0 +1,1133 @@
+﻿@model StretchFitnessHub.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = null;
+}
+@functions {
+    public string ConvertDaysToText(string days)
+    {
+        if (string.IsNullOrWhiteSpace(days))
+            return "No schedule";
+
+        return days;
+    }
+
+    public string FormatTime(TimeSpan time)
+    {
+        var dateTime = DateTime.Today.Add(time);
+        return dateTime.ToString("hh:mm tt");
+    }
+
+    public bool IsClassToday(string days)
+    {
+        if (string.IsNullOrWhiteSpace(days)) return false;
+
+        var today = DateTime.Today.DayOfWeek.ToString();
+        var scheduledDays = days.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        return scheduledDays.Contains(today, StringComparer.OrdinalIgnoreCase);
+    }
+
+    public bool IsClassOngoing(ClassSchedule cls)
+    {
+        if (string.IsNullOrWhiteSpace(cls.Days)) return false;
+
+        var today = DateTime.Today.DayOfWeek.ToString();
+        var scheduledDays = cls.Days.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        if (!scheduledDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+            return false;
+
+        var now = DateTime.Now.TimeOfDay;
+        return now >= cls.StartTime && now <= cls.EndTime;
+    }
+
+    public bool IsClassUpcoming(ClassSchedule cls)
+    {
+        if (string.IsNullOrWhiteSpace(cls.Days)) return false;
+
+        var today = DateTime.Today.DayOfWeek.ToString();
+        var scheduledDays = cls.Days.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        if (!scheduledDays.Contains(today, StringComparer.OrdinalIgnoreCase))
+            return false;
+
+        var now = DateTime.Now.TimeOfDay;
+        // Upcoming = 1 hour before start
+        return now >= cls.StartTime.Subtract(TimeSpan.FromHours(1)) && now < cls.StartTime;
+    }
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym Management System</title>
+    <meta http-equiv="refresh" content="86400">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="~/css/Css/Admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+          rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <img src="~/Images/LandingImages/logo.jpg" alt="Stretch Fitness Hub Logo" class="logo-img">
+            </a>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="#">
+                    <i class="ri-dashboard-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#mem">
+                    <i class="ri-user-line"></i>
+                    <span>Members</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="#class">
+                    <i class="ri-calendar-event-line"></i>
+                    <span>Classes</span>
+                </a>
+            </li>
+
+            @if (Model.CurrentUserRole == "Admin")
+            {
+                <li class="sidebar-item">
+                    <a href="#" id="settingsLink">
+                        <i class="ri-account-circle-line"></i>
+                        <span>Account</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="#" id="sfhPricingLink">
+                        <i class="ri-money-dollar-circle-line"></i>
+                        <span>Pricing</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </aside>
+
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <div>
+                    @if (Model.CurrentUserRole == "Admin")
+                    {
+                        <h1>Welcome back, Admin!</h1>
+                    }
+                    else if (Model.CurrentUserRole == "Staff")
+                    {
+                        <h1>Welcome back, Staff!</h1>
+                    }
+                    else
+                    {
+                        <h1>Welcome back!</h1>
+                    }
+                    <p id="date"></p>
+                </div>
+            </div>
+            <div class="action-buttons">
+
+                <button id="notification-bell" class="btn btn-outline">
+                    <i class="ri-notification-3-line"></i>
+                    Notifications
+                    <span id="notification-count" class="badge">@Model.NotificationCount</span>
+                </button>
+
+                <div id="notification-dropdown" class="notification-dropdown">
+                    @Html.AntiForgeryToken()
+
+                    <!-- WALK-IN REQUESTS -->
+                    @if (Model?.Notifications?.Any(n => n.Message.Contains("wants to walk in")) == true)
+                    {
+                        <div class="notif-card-group">
+                            <h4 class="notif-title">Pending Walk-In Requests</h4>
+
+                            @foreach (var notification in Model.Notifications
+                                                    .Where(n => !n.IsRead && n.Message.Contains("wants to walk in")))
+                            {
+                                <div class="notif-card unread" data-id="@notification.Id">
+                                    <div class="notif-info">
+                                        <p>@notification.Message</p>
+                                        <small>@notification.DateCreated.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                    <div class="notif-actions">
+                                        <form method="post" asp-action="ApproveWalkIn" asp-controller="Admin">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@notification.Id" />
+                                            <button type="submit" class="btn-approve">Approve</button>
+                                        </form>
+
+                                        <form method="post" asp-action="RejectWalkIn" asp-controller="Admin">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@notification.Id" />
+                                            <button type="submit" class="btn-reject">Reject</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="notif-empty">
+                            <p>No walk-in requests</p>
+                        </div>
+                    }
+
+                    <!-- REGISTRATION REQUESTS -->
+                    @if (Model?.RegistrationRequests != null && Model.RegistrationRequests.Any())
+                    {
+                        <div class="notif-card-group">
+                            <h4 class="notif-title">Pending Membership Registration Requests</h4>
+
+                            @foreach (var request in Model.RegistrationRequests)
+                            {
+                                <div class="notif-card unread" data-id="@request.Id">
+                                    <div class="notif-info">
+                                        <p>@request.FullName has requested to register.</p>
+                                        <small>@request.RequestDate.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                    <div class="notif-actions">
+                                        <form method="post" asp-action="ApproveRegistration" asp-controller="Admin">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@request.Id" />
+                                            <button type="submit" class="btn-approve">Approve</button>
+                                        </form>
+
+                                        <form method="post" asp-action="RejectRegistration" asp-controller="Admin">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@request.Id" />
+                                            <button type="submit" class="btn-reject">Reject</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="notif-empty">
+                            <p>No registration requests</p>
+                        </div>
+                    }
+
+                    <!-- MEMBERSHIP EXPIRING SOON -->
+                    @if (Model?.Notifications?.Any(n => n.Message.Contains("membership will expire")) == true)
+                    {
+                        <div class="notif-card-group">
+                            <h4 class="notif-title">Memberships Expiring Soon</h4>
+
+                            @foreach (var notification in Model.Notifications
+                                                    .Where(n => n.Message.Contains("membership will expire"))
+                                                    .OrderBy(n => n.DateCreated))
+                            {
+                                <div class="notif-card unread" data-id="@notification.Id">
+                                    <div class="notif-info">
+                                        <p>@notification.Message</p>
+                                        <small>@notification.DateCreated.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="notif-empty">
+                            <p>No expiring memberships</p>
+                        </div>
+                    }
+
+                </div>
+
+                <section class="bg-gray-100">
+                    <div id="logoutLoadingScreen" class="loading-overlay hidden">
+                        <div class="loading-spinner"></div>
+                        <p>Logging out...</p>
+                    </div>
+                    <button id="LogoutButton" class="btn btn-primary">
+                        <i class="ri-user-add-line"></i>
+                        Log out
+                    </button>
+                </section>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">Total Members</div>
+                <div class="stat-icon">
+                    <i class="ri-user-line"></i>
+                </div>
+            </div>
+            <span class="stat-value">@Model?.TotalMembersCount</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">Classes Today</div>
+                <div class="stat-icon">
+                    <i class="ri-calendar-check-line"></i>
+                </div>
+            </div>
+            <div class="stat-value">@Model?.ClassesToday</div>
+
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">Expiring Soon</div>
+                <div class="stat-icon">
+                    <i class="ri-timer-line"></i>
+                </div>
+            </div>
+            <div class="stat-value">@Model?.ExpiringSoon</div>
+        </div>
+    </div>
+
+
+    <div class="upcoming-classes" id="class">
+        <div class="classes-header">
+            <div class="classes-title">Classes</div>
+
+            @* Only Admin can see Add Class button *@
+            @if (Model.CurrentUserRole == "Admin")
+            {
+                <button id="openClassScheduleModalBtn" class="add-class-btn">Add Class</button>
+            }
+        </div>
+
+        <div class="class-list">
+            @if (Model.ClassSchedules != null && Model.ClassSchedules.Any())
+            {
+                @foreach (var cls in Model.ClassSchedules)
+                {
+                    // Determine class status
+                    bool isOngoing = Model.OngoingClasses != null && Model.OngoingClasses.Contains(cls.ClassName);
+                    bool isUpcoming = Model.UpcomingClasses != null && Model.UpcomingClasses.Contains(cls.ClassName);
+
+                    <div class="class-item"
+                         data-id="@cls.Id"
+                         data-name="@cls.ClassName"
+                         data-days="@cls.Days"
+                         data-start="@cls.StartTime.ToString(@"hh\:mm")"
+                         data-end="@cls.EndTime.ToString(@"hh\:mm")"
+                         data-coach="@cls.Coach">
+                        <div class="class-color" style="background-color: #3b82f6;"></div>
+                        <div class="class-info">
+                            <div class="class-name">
+                                @cls.ClassName
+                                @if (isOngoing)
+                                {
+                                    <span class="status ongoing">Ongoing</span>
+                                }
+                                else if (isUpcoming)
+                                {
+                                    <span class="status upcoming">Upcoming</span>
+                                }
+                            </div>
+
+                            <div class="class-details">
+                                <div class="class-detail">
+                                    <i class="ri-time-line"></i>
+                                    @ConvertDaysToText(cls.Days) @FormatTime(cls.StartTime) - @FormatTime(cls.EndTime)
+                                </div>
+                                <div class="class-detail">
+                                    <i class="ri-user-line"></i>
+                                    @cls.Coach
+                                </div>
+                            </div>
+                        </div>
+
+                        @* ✅ Only Admin can remove classes *@
+                        @if (Model.CurrentUserRole == "Admin")
+                        {
+                            <div class="class-actions">
+                                <button class="remove-class-btn" data-id="@cls.Id">🗑</button>
+                            </div>
+                        }
+                    </div>
+                }
+
+
+
+            }
+        </div>
+
+    </div>
+
+
+    <div id="customAlertModal" class="modal-overlay hidden">
+        <div class="modal-box alert-modal">
+            <p id="customAlertMessage"></p>
+            <div class="modal-actions">
+                <button id="customAlertCancel" class="btn btn-secondary">Cancel</button>
+                <button id="customAlertOk" class="btn btn-danger">Remove</button>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+    <div id="editClassModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h2>Edit Class</h2>
+            <form id="editClassForm">
+                <input type="hidden" id="editClassId" name="Id" />
+
+                <div class="form-group">
+                    <label>Class Name</label>
+                    <input type="text" id="editClassName" name="ClassName" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Days (comma separated)</label>
+                    <input type="text" id="editClassDays" name="Days" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" id="editStartTime" name="StartTime" required />
+                </div>
+
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" id="editEndTime" name="EndTime" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Coach</label>
+                    <input type="text" id="editCoach" name="Coach" required />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancelEditClass" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Class Schedule Modal -->
+    <div id="classScheduleModal" class="custom-modal-overlay">
+        <div class="custom-modal-container">
+            <div class="custom-modal-header">
+                <h2>Add Class Schedule</h2>
+                <button type="button" class="custom-modal-close" id="closeClassScheduleModal">&times;</button>
+            </div>
+
+            <form id="classScheduleForm" class="custom-modal-body">
+                <div class="form-group-custom">
+                    <label for="classNameInput" class="form-label-custom">Class Name</label>
+                    <input type="text" id="classNameInput" class="form-input-custom" placeholder="Enter class name" required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="coachInput" class="form-label-custom">Coach</label>
+                    <input type="text" id="coachInput" class="form-input-custom" placeholder="Enter coach name" required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="startTimeInput" class="form-label-custom">Start Time</label>
+                    <input type="time" id="startTimeInput" class="form-input-custom" required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="endTimeInput" class="form-label-custom">End Time</label>
+                    <input type="time" id="endTimeInput" class="form-input-custom" required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label class="form-label-custom">Select Days</label>
+                    <div class="days-checkbox-group">
+                        <label><input type="checkbox" value="Sunday"> Sun</label>
+                        <label><input type="checkbox" value="Monday"> Mon</label>
+                        <label><input type="checkbox" value="Tuesday"> Tue</label>
+                        <label><input type="checkbox" value="Wednesday"> Wed</label>
+                        <label><input type="checkbox" value="Thursday"> Thu</label>
+                        <label><input type="checkbox" value="Friday"> Fri</label>
+                        <label><input type="checkbox" value="Saturday"> Sat</label>
+                    </div>
+                </div>
+
+                <div class="custom-modal-footer">
+                    <button type="button" class="custom-btn cancel-btn" id="cancelClassScheduleBtn">Cancel</button>
+                    <button type="submit" class="custom-btn save-btn">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="recent-members" id="mem">
+        <h2>Members</h2>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search member name, email, or contact">
+            @* Only Admin can see Download PDF button *@
+            @if (Model.CurrentUserRole == "Admin")
+            {
+                <button id="printMembersBtn" class="print-btn">🖨 Download PDF</button>
+            }
+        </div>
+
+        <div class="member-tabs">
+            <div class="twotabs">
+                <button class="tab-btn active" onclick="showTab('active')">Active Gym Members</button>
+
+                @* Only Admin can see and manage Archived Members tab *@
+                @if (Model.CurrentUserRole == "Admin")
+                {
+                    <button class="tab-btn" onclick="showTab('archived')">Archived Members</button>
+                }
+
+                <button class="tab-btn" onclick="showTab('walkins')">Walk-ins</button>
+            </div>
+        </div>
+        
+        <div class="member-list">
+            <!-- ✅ ACTIVE MEMBERS -->
+            @if (Model?.Members != null && Model.Members.Any())
+            {
+                foreach (var member in Model.Members)
+                {
+                    <div class="member-item active"
+                         data-id="@member.Id"
+                         data-name="@member.FullName"
+                         data-email="@member.Email"
+                         data-phone="@member.PhoneNumber"
+                         data-membership="@(member.Status == "Active" && member.MembershipEnd >= DateTime.Now ? $"{member.MembershipStart:MMM dd, yyyy} - {member.MembershipEnd:MMM dd, yyyy}" : "No active membership")"
+                         data-class="@member.PreferredClasses"
+                         data-status="@member.Status"
+                         data-password="@member.Password"
+                         data-pic="@(string.IsNullOrEmpty(member.ProfileImagePath) ? "/images/default-profile.png" : member.ProfileImagePath)"
+                         style="display:flex">
+
+                        <div class="member-info">
+                            <div class="member-name">@member.FullName</div>
+                            <div class="member-status">
+                                @if (member.Status == "Inactive")
+                                {
+                                    <span class="status inactive">Inactive</span>
+                                }
+                                else if (member.Status == "Active")
+                                {
+                                    <span class="status active">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="status">@member.Status</span>
+                                }
+                            </div>
+
+                            <div class="member-details">
+                                <div class="member-email">@member.Email</div>
+                                <div class="member-contact">@member.PhoneNumber</div>
+                            </div>
+                        </div>
+
+                        <div class="membership-dates">
+                            @if (member.Status == "Active" && member.MembershipEnd >= DateTime.Now)
+                            {
+                                <div>Join: @member.MembershipStart.ToString("MMM dd, yyyy")</div>
+                                <div>End: @member.MembershipEnd.ToString("MMM dd, yyyy")</div>
+                            }
+                            else
+                            {
+                                <div>No active membership</div>
+                            }
+                        </div>
+
+                        <div class="options-container">
+                            <div class="three-dots" onclick="toggleMenu(this)">
+                                <span></span><span></span><span></span>
+                            </div>
+
+                            <div class="options-menu">
+                                @* Admin-only buttons *@
+                                @if (Model.CurrentUserRole == "Admin")
+                                {
+                                    <button type="button" onclick="archiveMember(@member.Id)">Archive</button>
+                                    <button type="button" onclick="deleteMember(@member.Id)">Delete</button>
+                                }
+
+                                @* Admin and Staff can Renew and Add Class *@
+                                <button type="button" onclick="renewMember(@member.Id)">Renew</button>
+                                <button type="button" onclick="openAddClassModal(@member.Id, '@member.FullName')">Add Class</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div id="noResults" class="no-results">No members found</div>
+            }
+
+            <!-- 🗃 ARCHIVED MEMBERS -->
+            @if (Model?.ArchivedMembers != null && Model.ArchivedMembers.Any())
+            {
+                foreach (var member in Model.ArchivedMembers)
+                {
+                    <div class="member-item archived"
+                         data-id="@member.Id"
+                         data-name="@member.FullName"
+                         data-email="@member.Email"
+                         data-phone="@member.PhoneNumber"
+                         data-membership="Archived"
+                         data-class="@member.PreferredClasses"
+                         data-status="@member.Status"
+                         data-password="@member.Password"
+                         data-pic="@(string.IsNullOrEmpty(member.ProfileImagePath) ? "/images/default-profile.png" : member.ProfileImagePath)"
+                         style="display:none">
+
+                        <div class="member-info">
+                            <div class="member-name">@member.FullName</div>
+                            <div class="member-status">
+                                <span class="status frozen">Archived</span>
+                                @if (member.FreezeStartDate.HasValue)
+                                {
+                                    <small>(since @member.FreezeStartDate.Value.ToString("MMM dd, yyyy"))</small>
+                                }
+                            </div>
+
+                            <div class="member-details">
+                                <div class="member-email">@member.Email</div>
+                                <div class="member-contact">@member.PhoneNumber</div>
+                            </div>
+                        </div>
+
+                        <div class="membership-dates">
+                            <div>No active membership</div>
+                        </div>
+
+                        @* Only Admin can see archived member options *@
+                        @if (Model.CurrentUserRole == "Admin")
+                        {
+                            <div class="options-container">
+                                <div class="three-dots" onclick="toggleMenu(this)">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <div class="options-menu">
+                                    <button type="button" onclick="unarchiveMember(@member.Id)">Unarchive</button>
+                                    <button type="button" onclick="deleteMember(@member.Id)">Delete</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div id="noArchived" class="no-results" style="display:none;">No archived members found</div>
+            }
+
+            <div class="walkins-header" style="display:none;">
+                <h2 id="walkinsLabel">Walk-ins</h2>
+            </div>
+
+            <div class="walkin-members">
+                @if (Model?.WalkIns != null && Model.WalkIns.Any(w => w.IsApprove))
+                {
+                    foreach (var walkin in Model.WalkIns.Where(w => w.IsApprove))
+                    {
+                        <div class="member-item walkins"
+                             data-id="@walkin.Id"
+                             data-name="@walkin.FullName"
+                             data-plan="@walkin.Plan"
+                             data-class="@walkin.PreferredClass"
+                             style="display:none">
+
+                            <div class="member-info">
+                                <div class="member-name">@walkin.FullName</div>
+                                <div class="member-status">
+                                    <span class="status walkin">Walk-in</span>
+                                </div>
+                            </div>
+
+                            <div class="membership-dates">
+                                <div>Time In: @walkin.TimeIn.ToString("hh:mm tt")</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div id="noWalkins" class="no-results" style="display:none;">No walk-ins found for today</div>
+                }
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <div id="confirmModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button id="confirmBtn" class="btn-confirm">Confirm</button>
+                <button id="cancelBtn" class="btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+    @if (Model.CurrentUserRole == "Admin")
+    {
+        <div id="settingsModal" class="modal-overlay hidden">
+            <div class="modal-content settings-modal">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button id="closeSettings" class="close-btn">&times;</button>
+                </div>
+
+                <div class="modal-switch">
+                    <button id="accountTab" class="switch-btn active">Update Account</button>
+                    <button id="staffTab" class="switch-btn">Manage Staff</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- ===== Update Account ===== -->
+                    <div id="accountSection" class="switch-section active">
+                        <h3>Update Account</h3>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" placeholder="New Username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">New Password</label>
+                            <input type="password" id="password" name="password" placeholder="New Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Admin Email" required>
+                        </div>
+                    </div>
+
+                    <!-- ===== Manage Staff ===== -->
+                    <div id="staffSection" class="switch-section hidden">
+                        <!-- Add Staff -->
+                        <h3>Add New Staff</h3>
+                        <form id="addStaffForm" method="post" asp-controller="Staff" asp-action="AddStaff">
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label for="staffFullName">Full Name</label>
+                                <input type="text" id="staffFullName" name="fullName" placeholder="Staff Full Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="staffUsername">Username</label>
+                                <input type="text" id="staffUsername" name="username" placeholder="Staff Username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="staffPassword">Password</label>
+                                <input type="password" id="staffPassword" name="password" placeholder="Staff Password" required>
+                            </div>
+                            <button type="submit" class="save-btn full-btn">Create Staff Account</button>
+                        </form>
+
+                        <!-- Success Modal -->
+                        <div id="newStaffModal" class="modal-overlay-unique hidden">
+                            <div class="modal-box-unique">
+                                <h3>Success!</h3>
+                                <p id="newStaffMessage">New staff account created successfully.</p>
+                            </div>
+                        </div>
+
+                        <hr class="divider" />
+
+                        <!-- Staff List -->
+                        <h3>Manage Staff Accounts</h3>
+                        <div class="staff-list-container-unique">
+                            @if (Model.Staffs != null && Model.Staffs.Count > 0)
+                            {
+                                @foreach (var staff in Model.Staffs)
+                                {
+                                    <div class="staff-item-unique" data-staff-id="@staff.Id" data-staff-name="@staff.FullName">
+                                        <div class="staff-info-unique">
+                                            <span class="staff-name-unique">@staff.FullName</span>
+                                            <span class="staff-username-unique">@staff.Username</span>
+                                        </div>
+                                        <div class="staff-actions-unique">
+                                            <form id="removeStaffForm-@staff.Id" method="post" asp-action="RemoveStaff" asp-controller="Staff">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@staff.Id" />
+                                                <button type="submit" class="btn btn-danger">Remove</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p id="noStaffMessage-unique">No staff accounts yet.</p>
+                            }
+                        </div>
+
+                        <p id="staffMessage">
+                            @if (TempData["Success"] != null)
+                            {
+                                @TempData["Success"]
+                            }
+                            @if (TempData["Error"] != null)
+                            {
+                                @TempData["Error"]
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="cancel-btn" id="cancelSettings">Cancel</button>
+                    <button class="save-btn" id="saveSettings">Update</button>
+                </div>
+            </div>
+        </div>
+
+    }
+
+
+    <!-- PRICING SUCCESS MODAL -->
+    <div id="sfhPricingSuccessModal" class="sfh-modal-overlay hidden">
+        <div class="modal-box sfh-pricing-modal">
+            <p id="sfhPricingSuccessMessage">✅ Pricing updated successfully!</p>
+        </div>
+    </div>
+
+
+
+
+    <div id="customAlertModal" class="modal-overlay hidden">
+        <div class="modal-box alert-modal">
+            <p id="customAlertMessage"></p>
+            <button id="customAlertOk" class="btn btn-primary">OK</button>
+        </div>
+    </div>
+
+    <!-- ✅ UNIQUE ALERT MODAL FOR ADD CLASS -->
+    <div id="addClassAlertModal" class="addclass-alert hidden">
+        <div class="addclass-alert-box">
+            <p id="addClassAlertMessage"></p>
+        </div>
+    </div>
+
+
+   @foreach (var member in Model.Members)
+{
+    <div id="memberProfileModal-@member.Id" class="profile-modal-overlay hidden">
+        <div class="profile-modal-box">
+            <div class="profile-modal-header">
+                <h2>@member.FullName's Profile</h2>
+                <button class="profile-close-btn" data-modal-id="memberProfileModal-@member.Id">&times;</button>
+            </div>
+
+            <div class="profile-modal-body">
+                <div class="profile-pic-container">
+                    <img src="@(member.ProfileImagePath ?? "/images/default-profile.png")" alt="Profile Picture" class="profile-pic-img">
+                </div>
+
+                <div class="profile-form-grid">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" value="@member.FullName" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" value="@member.Email" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" value="@member.PhoneNumber" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preferred Class</label>
+                        <input type="text" value="@(string.IsNullOrEmpty(member.PreferredClasses) ? "None" : member.PreferredClasses)" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Membership Plan</label>
+                        <input type="text" value="@member.MembershipPlan" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <input type="text" value="@member.Status" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="text" value="@member.Password" readonly>
+                    </div>
+                </div>
+
+                @if (member.QrCodeImage != null)
+                {
+                    <div class="qr-section">
+                        <label>QR Code</label>
+                        <img src="data:image/png;base64,@Convert.ToBase64String(member.QrCodeImage)" alt="QR Code" class="qr-image" />
+                    </div>
+
+                    <a asp-controller="Member" asp-action="DownloadQr" asp-route-id="@member.Id" class="download-btn">
+                        Download QR
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+    <div id="addClassMemberModal" class="modal add-class-member-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddClassModal()">&times;</span>
+            <h2>Add Class for <span id="memberNameSpan" data-member-id=""></span></h2>
+
+            <div class="modal-body">
+                <label for="classSelect">Select Class:</label>
+                <select id="classSelect" name="ClassId" required>
+                    <option value="" disabled selected>-- Choose a Class --</option>
+                    @if (Model.ClassSchedules != null && Model.ClassSchedules.Any())
+                    {
+                        foreach (var cls in Model.ClassSchedules)
+                        {
+                            <option value="@cls.Id">@cls.ClassName (@ConvertDaysToText(cls.Days))</option>
+                        }
+                    }
+                </select>
+
+                @Html.AntiForgeryToken()
+
+                <button type="button" id="confirmAddClassBtn" class="save-btn">Add Class</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <input type="hidden" id="actionResult" value="@TempData["ActionResult"]" />
+    <input type="hidden" id="memberName" value="@TempData["MemberName"]" />
+    <div id="actionModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h2 id="actionModalTitle"></h2>
+            <p id="actionModalMessage"></p>
+        </div>
+    </div>
+
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Log Out</h3>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Cancel</button>
+                <button id="confirmLogoutBtn" class="btn btn-primary">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ✅ PRICING MODAL (Correct final placement) -->
+    <div id="sfhPricingModalOverlay" class="sfh-pricing-overlay" style="display:none;">
+        <div class="sfh-pricing-container">
+            <h2 class="sfh-pricing-title">Update Pricing</h2>
+
+            <div class="sfh-pricing-content">
+                <label for="sfhPriceGymOnly">Gym Only Plan (Monthly)</label>
+                <input type="number" id="sfhPriceGymOnly" class="sfh-pricing-input">
+
+                <label for="sfhPriceGymWithClass">Gym with Class Plan (Monthly)</label>
+                <input type="number" id="sfhPriceGymWithClass" class="sfh-pricing-input">
+
+                <label for="sfhPriceClassOnly">Class Only Plan (Monthly)</label>
+                <input type="number" id="sfhPriceClassOnly" class="sfh-pricing-input">
+
+                <hr>
+
+                <label for="sfhPriceWalkInGym">Walk-in Gym Price</label>
+                <input type="number" id="sfhPriceWalkInGym" class="sfh-pricing-input">
+
+                <label for="sfhPriceWalkInClass">Walk-in Class Price</label>
+                <input type="number" id="sfhPriceWalkInClass" class="sfh-pricing-input">
+
+                <div class="sfh-pricing-buttons">
+                    <button id="sfhPricingSaveBtn" class="sfh-btn-save">Save</button>
+                    <button id="sfhPricingCloseBtn" class="sfh-btn-cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+
+
+    <script src="~/js/Js/Admin.js"></script>
+
+    <!-- ✅ TAB SWITCH SCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const accountTab = document.getElementById("accountTab");
+            const staffTab = document.getElementById("staffTab");
+            const accountSection = document.getElementById("accountSection");
+            const staffSection = document.getElementById("staffSection");
+
+            // Check elements exist
+            if (!accountTab || !staffTab || !accountSection || !staffSection) {
+                console.error("❌ One or more tab elements are missing.");
+                return;
+            }
+
+            // Update Account tab click
+            accountTab.addEventListener("click", function () {
+                accountTab.classList.add("active");
+                staffTab.classList.remove("active");
+                accountSection.classList.add("active");
+                accountSection.classList.remove("hidden");
+                staffSection.classList.remove("active");
+                staffSection.classList.add("hidden");
+            });
+
+            // Manage Staff tab click
+            staffTab.addEventListener("click", function () {
+                staffTab.classList.add("active");
+                accountTab.classList.remove("active");
+                staffSection.classList.add("active");
+                staffSection.classList.remove("hidden");
+                accountSection.classList.remove("active");
+                accountSection.classList.add("hidden");
+            });
+        });
+
+
+               // ✅ PRICING MODAL OPEN & LOAD VALUES
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const pricingBtn = document.getElementById("sfhPricingLink");
+            const pricingModal = document.getElementById("sfhPricingModalOverlay");
+            const closePricingBtn = document.getElementById("sfhPricingCloseBtn");
+            const savePricingBtn = document.getElementById("sfhPricingSaveBtn");
+
+            // OPEN PRICING MODAL
+            if (pricingBtn) {
+                pricingBtn.addEventListener("click", function () {
+                    fetch('/Admin/GetPricingSettings')
+                        .then(res => res.json())
+                        .then(data => {
+                            document.getElementById("sfhPriceGymOnly").value = data.gymOnly;
+                            document.getElementById("sfhPriceGymWithClass").value = data.gymWithClass;
+                            document.getElementById("sfhPriceClassOnly").value = data.classOnly;
+                            document.getElementById("sfhPriceWalkInGym").value = data.walkInGym;
+                            document.getElementById("sfhPriceWalkInClass").value = data.walkInClass;
+
+                            pricingModal.style.display = "flex";
+                        });
+                });
+            }
+
+            // CLOSE PRICING MODAL
+            if (closePricingBtn) {
+                closePricingBtn.addEventListener("click", function () {
+                    pricingModal.style.display = "none";
+                });
+            }
+
+            // ✅ SAVE BUTTON
+            if (savePricingBtn) {
+                savePricingBtn.addEventListener("click", function () {
+                    const body = {
+                        GymOnlyPrice: document.getElementById("sfhPriceGymOnly").value,
+                        GymWithClassPrice: document.getElementById("sfhPriceGymWithClass").value,
+                        ClassOnlyPrice: document.getElementById("sfhPriceClassOnly").value,
+                        WalkInGymPrice: document.getElementById("sfhPriceWalkInGym").value,
+                        WalkInClassPrice: document.getElementById("sfhPriceWalkInClass").value
+                    };
+
+                    fetch('/Admin/UpdatePricingSettings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(body)
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        // Hide the pricing modal
+                        pricingModal.style.display = "none";
+
+                        // Show the dedicated pricing success modal
+                        const modal = document.getElementById('sfhPricingSuccessModal');
+                        const messageElem = document.getElementById('sfhPricingSuccessMessage');
+
+                        if (!modal || !messageElem) return;
+
+                        // Set message
+                        messageElem.textContent = "✅ Pricing updated successfully!";
+
+                        // Show modal with fade-in
+                        modal.classList.remove('hidden');
+                        setTimeout(() => modal.classList.add('show'), 10);
+
+                        // Auto-hide after 3 seconds with fade-out
+                        setTimeout(() => {
+                            modal.classList.remove('show'); // fade-out
+                            setTimeout(() => modal.classList.add('hidden'), 300); // hide after fade-out
+                            location.reload(); // optional: remove if no reload desired
+                        }, 3000);
+                    });
+                });
+            }
+
+        });
+
+    </script>
+
+
+
+</body>
+</html>

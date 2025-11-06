@@ -1,0 +1,457 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/Css/landing.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <title>Stretch Fitness Hub</title>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <!-- Hamburger menu button (left side, only visible on mobile) -->
+            <button class="mobile-menu-button" id="mobileMenuBtn" aria-label="Open menu">
+                <i class="ri-menu-line" style="font-size:2rem;"></i>
+            </button>
+            <!-- Logo (hidden on mobile) -->
+            <a href="#" class="logo">
+                <img src="~/Images/LandingImages/logo.jpg" alt="Stretch Fitness Hub Logo" class="logo-img">
+            </a>
+            <nav class="nav">
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#classes" class="nav-link">Classes</a>
+                <a href="#register" class="nav-link">Register</a>
+                <a href="#benefits" class="nav-link">Benefits</a>
+                <a href="#coaches" class="nav-link">Coaches </a>
+            </nav>
+            <!-- Become a Member button (hidden on mobile) -->
+            <div class="header-actions">
+                <a href="#register" class="butun">Become a Member</a>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-menu-content">
+                <a href="#services" class="mobile-nav-link">Services</a>
+                <a href="#classes" class="mobile-nav-link">Classes</a>
+                <a href="#register" class="mobile-nav-link">Register</a>
+                <a href="#benefits" class="mobile-nav-link">Benefits</a>
+                <a href="#coaches" class="mobile-nav-link">Coaches</a>
+                <a href="#register" class="mobile-join-now-button">Become a Member</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="container hero-content">
+            <div class="hero-text-container">
+                <h1 class="hero-title">Transform Your <span class="text-primary">Body</span>, Transform Your <span class="text-primary">Life</span></h1>
+                <p class="hero-subtitle">Join the ultimate fitness experience with state-of-the-art equipment, expert trainers, and a supportive community ready to help you achieve your goals.</p>
+                <div class="hero-buttons">
+                    <button class="butunn" onclick="openLogin()">Login</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="services-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Services</h2>
+                <p class="section-subtitle">Discover a wide range of services designed to help you reach your fitness goals, no matter your experience level.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon-container">
+                        <i class="ri-user-heart-line ri-xl service-icon"></i>
+                    </div>
+
+                    <h3 class="service-card-title">Personal Training</h3>
+                    <p class="service-card-description">One-on-one sessions with certified trainers who will create customized workout plans to help you achieve your specific goals.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon-container">
+                        <i class="ri-group-line ri-xl service-icon"></i>
+                    </div>
+                    <h3 class="service-card-title">Classes</h3>
+                    <p class="service-card-description">Energetic and motivating classes led by expert instructors, from high-intensity workouts to mindful sessions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="classes" class="classes-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Featured Classes</h2>
+                <p class="section-subtitle">Join our energetic group classes led by expert instructors to maximize your fitness journey.</p>
+            </div>
+
+            <div class="class-slider-container">
+                <div class="class-slider">
+                    <div class="class-card">
+                        <div class="class-image-container">
+                            <img src="https://readdy.ai/api/search-image?query=high-intensity%20interval%20training%20class%20with%20diverse%20group%20of%20people%2C%20energetic%20atmosphere%2C%20blue%20lighting%2C%20professional%20fitness%20photography&width=400&height=300&seq=class1&orientation=landscape" alt="HIIT Class" class="class-image">
+                        </div>
+                        <div class="class-info">
+                            <div class="class-meta">
+                                <span class="class-tag primary-tag">High Intensity</span>
+                            </div>
+                            <h3 class="class-title">TABATA/HIIT</h3>
+                            <p class="class-description">High-intensity interval training to maximize calorie burn and improve cardiovascular health.</p>
+                            <div class="trainer-info">
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="class-card">
+                        <div class="class-image-container">
+                            <img src="~/Images/LandingImages/Dance.jpg" alt="Dance Class" class="class-image">
+                        </div>
+                        <div class="class-info">
+                            <div class="class-meta">
+                                <span class="class-tag green-tag">Moderate</span>
+                            </div>
+                            <h3 class="class-title">Dance Class</h3>
+                            <p class="class-description">Dance class is a structured session where individuals learn and practice various dance styles, focusing on technique, rhythm, and expression..</p>
+                            <div class="trainer-info">
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="class-card">
+                        <div class="class-image-container">
+                            <img src="~/Images/LandingImages/boxingg.jpg" alt="Boxing Class" class="class-image">
+                        </div>
+                        <div class="class-info">
+                            <div class="class-meta">
+                                <span class="class-tag orange-tag">High Intensity</span>
+                            </div>
+                            <h3 class="class-title">Boxing</h3>
+                            <p class="class-description">Boxing is a combat sport where two opponents wearing gloves throw punches at each other in a roped ring, aiming to score points or achieve a knockout.</p>
+                            <div class="trainer-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="class-card">
+                        <div class="class-image-container">
+                            <img src="~/Images/LandingImages/muay thai.jpg" alt="Muay Thai" class="class-image">
+                        </div>
+                        <div class="class-info">
+                            <div class="class-meta">
+                                <span class="class-tag red-tag">Advanced</span>
+                            </div>
+                            <h3 class="class-title">Muay Thai</h3>
+                            <p class="class-description">Muay Thai, known as "The Art of Eight Limbs," is a Thai combat sport that utilizes stand-up striking along with various clinching techniques, employing fists, elbows, knees, and shins.</p>
+                            <div class="trainer-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="class-card">
+                        <div class="class-image-container">
+                            <img src="~/Images/LandingImages/karate.jpg" alt="Karate" class="class-image">
+                        </div>
+                        <div class="class-info">
+                            <div class="class-meta">
+                                <span class="class-tag purple-tag">High Energy</span>
+                            </div>
+                            <h3 class="class-title">Karate</h3>
+                            <p class="class-description">Karate is a Japanese martial art focusing on striking techniques with hands, feet, elbows, and knees, emphasizing physical and mental discipline, and often translated as "empty hand".</p>
+                            <div class="trainer-info">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="register" class="register-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Become a Member Today</h2>
+                <p class="section-subtitle">Join our fitness community and start your transformation journey with a simple scan.</p>
+            </div>
+            <div class="qr-container">
+                <div class="qr-info-column">
+                    <h3 class="qr-info-title">Quick Registration</h3>
+                    <p class="qr-info-description">Register in under 2 minutes and get instant access to our facilities and exclusive member benefits.</p>
+                    <div class="qr-steps">
+                        <div class="qr-step">
+                            <div class="step-icon">
+                                <span>1</span>
+                            </div>
+                            <div>
+                                <h4 class="step-title">Scan the QR Code</h4>
+                                <p class="step-description">Use your smartphone camera to scan the QR code on the right.</p>
+                            </div>
+                        </div>
+                        <div class="qr-step">
+                            <div class="step-icon">
+                                <span>2</span>
+                            </div>
+                            <div>
+                                <h4 class="step-title">Complete Your Profile</h4>
+                                <p class="step-description">Fill in your details and select your preferred membership plan.</p>
+                            </div>
+                        </div>
+                        <div class="qr-step">
+                            <div class="step-icon">
+                                <span>3</span>
+                            </div>
+                            <div>
+                                <h4 class="step-title">Confirm & Pay</h4>
+                                <p class="step-description">Secure payment process with multiple payment options available.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="qr-code-column" style="text-align: center;">
+                    <h3 class="qr-code-title" style="color: #fff; font-size: 1.25rem; margin-bottom: 15px;">Scan to Register</h3>
+
+                    <!-- Toggle Buttons -->
+                    <div class="qr-toggle-buttons" style="margin-bottom: 15px;">
+                        <button id="membershipQRBtn" class="toggle-btn"
+                                style="background: #2563eb; color: #fff; padding: 8px 16px; margin-right: 8px; border-radius: 6px;">
+                            Membership QR
+                        </button>
+                        <button id="walkinQRBtn" class="toggle-btn"
+                                style="background: #2563eb; color: #111827; padding: 8px 16px; border-radius: 6px;">
+                            Walk-ins QR
+                        </button>
+                    </div>
+
+                    <!-- QR Code Display -->
+                    <div class="qr-code-box"
+                         style="background: #111827; border: 1px solid #1f2937; border-radius: 10px;
+ padding: 20px; display: flex; justify-content: center; align-items: center;
+ box-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 15px;">
+                        <img id="qrImage" src="/Admin/GenerateRegistrationQRCode"
+                             alt="Registration QR Code"
+                             style="width: 200px; height: 200px; object-fit: contain;">
+                    </div>
+
+                    <!-- QR Label -->
+                    <p id="qrLabel" class="qr-code-text" style="color: #9ca3af; font-size: 0.95rem; margin-bottom: 15px;">
+                        Membership QR
+                    </p>
+
+                    <!-- Download Button -->
+                    <a id="downloadQRBtn" href="/Admin/GenerateRegistrationQRCode" download="RegistrationQR.png"
+                       class="download-btn"
+                       style="display: inline-block; padding: 10px 20px; background: linear-gradient(90deg,#2563eb,#1d4ed8);
+color: white; text-decoration: none; border-radius: 8px; font-weight: 500;
+transition: background 0.3s ease, transform 0.2s ease;">
+                        <i class="fa fa-download" style="margin-right: 6px;"></i> Download QR Code
+                    </a>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <section id="benefits" class="benefits-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Membership Benefits</h2>
+                <p class="section-subtitle">Enjoy exclusive perks and amenities designed to enhance your fitness experience.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon-container">
+                        <i class="ri-24-hours-line ri-xl benefit-icon"></i>
+                    </div>
+                    <h3 class="benefit-card-title">Gym Access</h3>
+                    <p class="benefit-card-description">
+                        Workout on your schedule with round-the-clock access to our state-of-the-art facilities.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon-container">
+                        <i class="ri-group-line ri-xl benefit-icon"></i>
+                    </div>
+                    <h3 class="benefit-card-title">Free Wifi</h3>
+                    <p class="benefit-card-description">
+                        Stay connected effortlessly with our complimentary high-speed Wi-Fi, perfect for Browse, working, or sharing your moments.
+                    </p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon-container">
+                        <i class="ri-user-heart-line ri-xl benefit-icon"></i>
+                    </div>
+                    <h3 class="benefit-card-title">Free Brewed Coffee</h3>
+                    <p class="benefit-card-description">
+                        Enjoy a freshly brewed cup of our aromatic coffee, on the house, to perk up your day.
+                    </p>
+                </div>
+
+                <div class="benefit-card empty-card"></div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon-container">
+                        <i class="ri-heart-pulse-line ri-xl benefit-icon"></i>
+                    </div>
+                    <h3 class="benefit-card-title">Locker Room & Shower Access</h3>
+                    <p class="benefit-card-description">
+                        Freshen up before or after your workout with our clean and spacious locker rooms, equipped with private showers for your convenience.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section id="coaches" class="coaches-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Coaches</h2>
+                <p class="section-subtitle">Reach your full potential with personalized guidance and expert support from our certified coaches, dedicated to helping you achieve your fitness aspirations.</p>
+            </div>
+            <div class="coaches-grid">
+                <div class="coaches-card">
+                    <div class="coaches-image-container">
+                        <img src="LandingPics/ry.jpg" alt="Coach" class="coaches-image">
+                    </div>
+                    <div class="coaches-content">
+                        <div class="stars">
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                        </div>
+                        <p class="coaches-text">"Coach Kardelito excels in gym training, dance classes, and Tabata, providing comprehensive guidance to enhance your strength, cardio, and overall fitness through varied and engaging workouts."</p>
+                        <div class="coaches-info">
+                            <p class="coaches-name">Kardelito</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="coaches-card">
+                    <div class="coaches-image-container">
+                        <img src="~/Images/LandingImages/ry.jpg" alt="Coach" class="coaches-image">
+                    </div>
+                    <div class="coaches-content">
+                        <div class="stars">
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                            <i class="ri-star-fill star-icon"></i>
+                        </div>
+                        <p class="coaches-text">"Coach Freddie Roach is a seasoned expert in Mixed Martial Arts (MMA), offering specialized instruction to develop your boxing, muay Thai, karate, and combat techniques for self-defense and competitive readiness."</p>
+                        <div class="coaches-info">
+                            <p class="coaches-name">Freddie Roach</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container cta-content">
+            <h2 class="cta-title">Ready to Transform Your Life?</h2>
+            <p class="cta-subtitle">Join Stretch Fitness Hub today and start your journey towards a healthier, stronger, and more confident you.</p>
+            <div class="contact-info-grid">
+                <div class="contact-card">
+                    <div class="contact-icon-container">
+                        <i class="ri-map-pin-line ri-lg contact-icon"></i>
+                    </div>
+                    <div class="contact-text-container">
+                        <h3 class="contact-title">Visit Us</h3>
+                        <p class="contact-detail">Spinal Road, Garden Villas 3, Santa Rosa Laguna Philippines</p>
+                    </div>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon-container">
+                        <i class="ri-phone-line ri-lg contact-icon"></i>
+                    </div>
+                    <div class="contact-text-container">
+                        <h3 class="contact-title">Call Us</h3>
+                        <p class="contact-detail">0945-800-6889</p>
+                    </div>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon-container">
+                        <i class="ri-time-line ri-lg contact-icon"></i>
+                    </div>
+                    <div class="contact-text-container">
+                        <h3 class="contact-title">Hours</h3>
+                        <p class="contact-detail">Monday - Saturday: 6am-10pm</p>
+                        <p class="contact-detail">Sunday: 6am-7pm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+
+        <!-- Loading overlay -->
+        <div id="loginLoadingScreen" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Logging in...</p>
+        </div>
+
+        <!-- MODAL BOX -->
+        <div class="modal-box" style="background:#111827; padding:20px; border-radius:10px; width:350px; position:relative; color:white;">
+            <button class="close-btn" onclick="closeLogin()" style="position:absolute; top:10px; right:10px; font-size:1.5rem; background:none; border:none; cursor:pointer;">×</button>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm" class="modal-form active" method="post" asp-action="Login" asp-controller="Account">
+                <h2 class="title-modal">Login</h2>
+                <input type="text" id="username" name="Username" placeholder="Username" required />
+                <input type="password" id="password" name="Password" placeholder="Password" required />
+                <button type="submit" class="butun">Login</button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ERROR MODAL -->
+    <div id="loginErrorModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1100;">
+        <div class="modal-box error-box" style="background:#111827; padding:20px; border-radius:10px; width:300px; position:relative; color:white;">
+            <button class="close-btn" onclick="closeLoginError()" style="position:absolute; top:10px; right:10px; font-size:1.5rem; background:none; border:none; cursor:pointer;">×</button>
+            <h2 class="title-modal">Login Failed</h2>
+            <p id="loginErrorMessage">Invalid username or password.</p>
+            <button class="butun" onclick="closeLoginError()">OK</button>
+        </div>
+    </div>
+
+
+
+    <script src="~/Js/js/landing.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var loginError = '@TempData["LoginError"]';
+            if (loginError && loginError.length > 0) {
+                openLoginError(loginError);
+                document.getElementById("loginModal").style.display = "flex";
+            }
+        });
+    </script>
+
+</body>
+</html>
