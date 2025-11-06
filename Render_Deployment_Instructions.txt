@@ -1,0 +1,32 @@
+# Stretch Fitness Hub Deployment – Docker & Render
+
+1️⃣ Dockerfile (ilagay sa root ng project)
+- Filename: Dockerfile (walang .txt)
+- Content: Dockerfile instructions
+
+2️⃣ Git Commands
+- git add Dockerfile Render_Deployment_Instructions.txt
+- git commit -m "Add Dockerfile and deployment instructions for Render"
+- git push
+
+3️⃣ Render.com Web Service Setup
+- Sa Render → New → Web Service
+- Source: GitHub → StretchFitnessHub
+- Branch: main
+- Language: Docker
+- Name: stretch-fitness-hub
+- Instance Type: Free
+- Root Directory: leave empty
+- Environment Variables (kung may DB):
+  NAME: ConnectionStrings__DefaultConnection
+  VALUE: <connection string>
+
+4️⃣ Deploy
+- Click Deploy Web Service
+- Hintayin matapos ang build at deploy
+- Makakakuha ng HTTPS URL → puwede i-test ang QR scanner feature
+
+5️⃣ Notes
+- Pag may bagong push sa GitHub → Render auto-deploy
+- Siguraduhin reachable ang database connection string
+- QR scanner feature puwede sa kahit anong device via HTTPS
